@@ -326,7 +326,7 @@ public class RevHubTest_26 extends OpMode {
         lift_motor_Right.setTargetPosition(clamp(0, liftMax, right));
     }
 
-    private String checkColor() {
+    /*private String checkColor() {
         int left = colorLeft.red() - colorLeft.blue();
         int right = colorRight.red() - colorRight.blue();
 
@@ -339,5 +339,19 @@ public class RevHubTest_26 extends OpMode {
         else {
             return "NONE";
         }
+    }*/
+    
+    private double checkColor() {
+        int left = colorLeft.red() - colorLeft.blue();
+        int right = colorRight.red() - colorRight.blue();
+
+        if (left > right) {
+            return 0.0d;
+        }
+        else if (left < right) {
+            return 1.0d;
+        }
+        else {
+            return 0.50d;
     }
 }
