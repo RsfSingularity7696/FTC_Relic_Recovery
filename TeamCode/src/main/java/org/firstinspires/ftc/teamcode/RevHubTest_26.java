@@ -90,7 +90,7 @@ public class RevHubTest_26 extends OpMode {
     private Servo gripLeft = null;
     private Servo gripRight = null;
 
-    private int _liftPosition = lift_motor_Right.getCurrentPosition();
+    private int _liftPosition = 0; // lift_motor_Right.getCurrentPosition();
 
 
 
@@ -120,7 +120,7 @@ public class RevHubTest_26 extends OpMode {
         lift_motor_Right = hardwareMap.get(DcMotor.class, "liftMotor2");
         lift_motor_Right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
+        _liftPosition = lift_motor_Right.getCurrentPosition();
     }
 
     /*
