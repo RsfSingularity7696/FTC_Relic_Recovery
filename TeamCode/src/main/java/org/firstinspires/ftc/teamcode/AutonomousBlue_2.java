@@ -32,40 +32,38 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.Locale;
+//import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 //In this test I programmed everything according to the chart on my phone. Programmed the motors to move with encoders
-@TeleOp(name="Autonomous Blue", group="Pushbot")
-@Disabled
-public class AutonomousBlue_1 extends OpMode {
+@TeleOp(name="Autonomous Blue_2", group="Pushbot")
+public class AutonomousBlue_2 extends OpMode {
     private SampleOp_EngineModule engine = new SampleOp_EngineModule();
-    private ColorSensor color_sensor;
-    private DistanceSensor distance_sensor = null;
+ //   private ColorSensor color_sensor;
+   // private DistanceSensor distance_sensor = null;
  // private DcMotor encoder_motor = null;
     private DcMotor lift_motor_Left = null;
     private DcMotor lift_motor_Right = null;
 
+    private ColorSensor colorRight = null;
+    private ColorSensor colorLeft = null;
 
     private Servo jewelArm = null;
     //private Servo accuator = null;
     private Servo topClaw = null;
     private Servo botClaw = null;
+    private Servo knocker = null;
 
     private double maxSpeed = 1.0d;
     private double moveSpeed = 1.0d;
 
-    private int stage = 0;
+    private int stage = -1;
 
     private double timeOffSet =0;
 
@@ -80,10 +78,12 @@ public class AutonomousBlue_1 extends OpMode {
         //accuator = hardwareMap.servo.get("accuator");
         topClaw = hardwareMap.servo.get("topClaw");
         botClaw = hardwareMap.servo.get("botClaw");
+        knocker = hardwareMap.servo.get("knocker");
+        colorLeft = hardwareMap.colorSensor.get("colorLeft1");
+        colorRight = hardwareMap.colorSensor.get("colorRight0");
 
-
-        color_sensor = hardwareMap.colorSensor.get("color");
-        distance_sensor = hardwareMap.get(DistanceSensor.class, "color");
+      //  color_sensor = hardwareMap.colorSensor.get("color");
+       // distance_sensor = hardwareMap.get(DistanceSensor.class, "color");
         //encoder_motor = hardwareMap.get(DcMotor.class, "encoder");
         //encoder_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -92,6 +92,9 @@ public class AutonomousBlue_1 extends OpMode {
 
         lift_motor_Right = hardwareMap.get(DcMotor.class, "liftMotor2");
         lift_motor_Right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        engine.SetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     /*
@@ -106,11 +109,14 @@ public class AutonomousBlue_1 extends OpMode {
      */
     @Override
     public void start() {
-        topClaw.setPosition(0.0d);
+        topClaw.setPosition(1.0d);
         botClaw.setPosition(0.0d);
         jewelArm.setPosition(0.0d);
+      //  knocker.setPosition(0.0d);
         lift_motor_Left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift_motor_Right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        engine.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /*
@@ -119,42 +125,98 @@ public class AutonomousBlue_1 extends OpMode {
     @Override
     public void loop() {
         switch (stage) {
-            case 0:
-                jewelArm.setPosition(1.0d);
+            case -1:
+                jewelArm.setPosition(0.8d);
 
-                timeOffSet = time;
-                stage++;
+                NextStage();
+                break;
+            case 0:
+                if(jewelArm.getPosition() >= 0.7d){
+                    jewelArm.setPosition(1.0d);
+                }
+
+
+                NextStage();
                 break;
             case 1:
                 if (jewelArm.getPosition() >= 0.90d && time > (timeOffSet + 2.0d)) {
-                    stage++;
+                    NextStage();
                 }
                 break;
             case 2:
-                if (color_sensor.red() < color_sensor.blue()) {
-                    stage = 4;
-                }
-                else {
-                    stage = 3;
+                String _color = checkColor();
+
+                if (_color == "LEFT") {
+                    GoToStage(4);
+                } else if (_color == "RIGHT") {
+                    GoToStage(3);
+                } else {
+                    GoToStage(5);
                 }
                 break;
             case 3:
-                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontRight).getCurrentPosition() > -250) {
-                    engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontRight).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    engine.SetSpeed(-0.10d, -0.10d);
-                }
-                else {
-                    stage = 10;
+                knocker.setPosition(1.0d);
+
+                if ( time > (timeOffSet + 2.0d)) {
+                    GoToStage(6);
                 }
                 break;
             case 4:
-                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontRight).getCurrentPosition() < 250) {
-                    engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontRight).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    engine.SetSpeed(1.0d, 1.0d);
-                    stage++;
+                knocker.setPosition(-1.0d);
+
+                if ( time > (timeOffSet + 2.0d)) {
+                    GoToStage(6);
+                }
+                break;
+
+            case 5:
+                GoToStage(6);
+                break;
+
+            case 6:
+                jewelArm.setPosition(0.0d);
+
+                if ( time > (timeOffSet + 2.0d)) {
+                    NextStage();
+                }
+                break;
+            case 7:
+                lift(800, 0);
+
+                if ( time > (timeOffSet + 2.0d)) {
+                    NextStage();
+                }
+                break;
+            case 8:
+                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getCurrentPosition() < 2050) {
+                    if(engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getMode() != DcMotor.RunMode.RUN_USING_ENCODER) {
+                        engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+
+                    engine.SetSpeed(0.20d, 0.20d);
                 }
                 else {
-                    stage = 10;
+                    NextStage();
+                }
+                break;
+            case 9:
+                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getMode() != DcMotor.RunMode.STOP_AND_RESET_ENCODER) {
+                    engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                    NextStage();
+                }
+                break;
+            case 10:
+                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getCurrentPosition() < 1000) {
+                    if(engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getMode() != DcMotor.RunMode.RUN_USING_ENCODER) {
+                        engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+
+                    engine.Move(SampleOp_States.Dpad.Left, 0.20d);
+                   // engine.SetSpeed(-0.20d, -0.20d);
+                }
+                else {
+                    NextStage();
                 }
                 break;
             default:
@@ -168,14 +230,14 @@ public class AutonomousBlue_1 extends OpMode {
         telemetry.addData("BackLeft: ", engine.GetPosition(SampleOp_EngineModule.EngineMotor.BackLeft));
         telemetry.addData("BackRight: ", engine.GetPosition(SampleOp_EngineModule.EngineMotor.BackRight));
 
-        telemetry.addData("Distance (cm): ", String.format(Locale.US, "%.02f", distance_sensor.getDistance(DistanceUnit.CM)));
+       // telemetry.addData("Distance (cm): ", String.format(Locale.US, "%.02f", distance_sensor.getDistance(DistanceUnit.CM)));
 
-        telemetry.addData("Red: ", color_sensor.red());
-        telemetry.addData("Green: ", color_sensor.green());
-        telemetry.addData("Blue: ", color_sensor.blue());
-        telemetry.addData("Alpha: ", color_sensor.alpha());
-        telemetry.addData("Argb: ", color_sensor.argb());
-        telemetry.update();
+      //  telemetry.addData("Red: ", color_sensor.red());
+       // telemetry.addData("Green: ", color_sensor.green());
+        //telemetry.addData("Blue: ", color_sensor.blue());
+        //telemetry.addData("Alpha: ", color_sensor.alpha());
+        //telemetry.addData("Argb: ", color_sensor.argb());
+        //telemetry.update();
     }
 
     /*
@@ -185,8 +247,7 @@ public class AutonomousBlue_1 extends OpMode {
     public void stop() {
         engine.Stop();
 
-        lift_motor_Left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift_motor_Right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
     }
 
     public SampleOp_States.Dpad GetInputs(Gamepad gamepad) {
@@ -234,6 +295,21 @@ public class AutonomousBlue_1 extends OpMode {
         }
     }
 
+    private String checkColor() {
+        int left = colorLeft.red() - colorLeft.blue();
+        int right = colorRight.red() - colorRight.blue();
+
+        if (left > right) {
+            return "LEFT";
+        }
+        else if (left < right) {
+            return "RIGHT";
+        }
+        else {
+            return "NONE";
+        }
+    }
+
     private void lift(int position) {
         lift(position, position);
     }
@@ -245,4 +321,20 @@ public class AutonomousBlue_1 extends OpMode {
         lift_motor_Right.setPower(1.0d);
         lift_motor_Right.setTargetPosition(right);
     }
+
+    private void GoToStage(int target) {
+        timeOffSet = time;
+        stage = target;
+    }
+
+    private void NextStage() {
+        timeOffSet = time;
+        stage++;
+    }
+
+    private void PreviousStage() {
+        timeOffSet = time;
+        stage--;
+    }
+
 }
