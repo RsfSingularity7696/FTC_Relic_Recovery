@@ -106,6 +106,12 @@ public class TestGyroOp extends LinearOpMode
 
         // Loop and update the dashboard
         while (opModeIsActive()) {
+            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+            telemetry.addData("Z: ", angles.firstAngle);
+            telemetry.addData("Y: ", angles.secondAngle);
+            telemetry.addData("X: ", angles.thirdAngle);
+
             telemetry.update();
         }
     }
