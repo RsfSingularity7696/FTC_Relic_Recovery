@@ -42,9 +42,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 //this test will have provided for thechanges on the lists. Anything that was deleted or commented out in this program can be found in Test 25.
-@TeleOp(name="RevHubTest 35", group="Pushbot")
+@TeleOp(name="RevHubTest 36", group="Pushbot")
 @Disabled
-public class RevHubTest_35 extends OpMode {
+public class RevHubTest_36 extends OpMode {
     private enum LiftType  {
         Manual,
         Relic,
@@ -302,6 +302,9 @@ public class RevHubTest_35 extends OpMode {
 
         telemetry.addData("Left: ", lift_motor_Left.getPower());
         telemetry.addData("Right: ", lift_motor_Right.getPower());
+
+        telemetry.addData("leftLift: ", lift_motor_Left.getPower());
+        telemetry.addData("rightLift: ", lift_motor_Right.getPower());
 
 
 

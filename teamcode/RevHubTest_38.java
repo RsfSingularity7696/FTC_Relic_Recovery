@@ -42,9 +42,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 //this test will have provided for thechanges on the lists. Anything that was deleted or commented out in this program can be found in Test 25.
-@TeleOp(name="RevHubTest 35", group="Pushbot")
+@TeleOp(name="RevHubTest 38", group="Pushbot")
 @Disabled
-public class RevHubTest_35 extends OpMode {
+public class RevHubTest_38 extends OpMode {
     private enum LiftType  {
         Manual,
         Relic,
@@ -259,14 +259,15 @@ public class RevHubTest_35 extends OpMode {
         if (gamepad2.dpad_down && scissor_Relic.getCurrentPosition() >= 100 || gamepad2.y){
             scissor_Relic.setPower(-1.0d);
         }
-        else if (gamepad2.dpad_up && scissor_Relic.getCurrentPosition() <= 3220){
+        //For the Scissor Lift, the old value is 3220
+        else if (gamepad2.dpad_up && scissor_Relic.getCurrentPosition() <= 1489){
             scissor_Relic.setPower(1.0d);
         }
         else {
             scissor_Relic.setPower(0.0d);
         }
 
-        if (gamepad2.dpad_right && relic_Motor.getCurrentPosition() <= 1770){
+        if (gamepad2.dpad_right && relic_Motor.getCurrentPosition() <= 1975){
             relic_Motor.setPower(1.0d);
         }
         else if (gamepad2.dpad_left && relic_Motor.getCurrentPosition() >= 50 || gamepad2.x){
@@ -302,6 +303,9 @@ public class RevHubTest_35 extends OpMode {
 
         telemetry.addData("Left: ", lift_motor_Left.getPower());
         telemetry.addData("Right: ", lift_motor_Right.getPower());
+
+        telemetry.addData("leftLift: ", lift_motor_Left.getPower());
+        telemetry.addData("rightLift: ", lift_motor_Right.getPower());
 
 
 

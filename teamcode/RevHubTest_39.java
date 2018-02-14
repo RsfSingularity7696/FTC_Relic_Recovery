@@ -32,7 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -42,9 +41,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 //this test will have provided for thechanges on the lists. Anything that was deleted or commented out in this program can be found in Test 25.
-@TeleOp(name="RevHubTest 35", group="Pushbot")
-@Disabled
-public class RevHubTest_35 extends OpMode {
+@TeleOp(name="RevHubTest 39", group="Pushbot")
+public class RevHubTest_39 extends OpMode {
     private enum LiftType  {
         Manual,
         Relic,
@@ -54,6 +52,8 @@ public class RevHubTest_35 extends OpMode {
     private boolean _rightTriggerDown = false;
 
     private boolean    _lockOn = false;
+
+
 
     private int _lockPosition = 0;
     private int liftMax = 1500;
@@ -80,6 +80,9 @@ public class RevHubTest_35 extends OpMode {
 
     private DcMotor relic_Motor = null;
     private DcMotor scissor_Relic = null;
+
+    private int _scissPosition1 = 310;
+    private int _scissPosition2 = 1237;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -144,7 +147,7 @@ public class RevHubTest_35 extends OpMode {
         lift_motor_Right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         relic_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        scissor_Relic.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        scissor_Relic.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /*
@@ -256,17 +259,44 @@ public class RevHubTest_35 extends OpMode {
             }
         }
 
-        if (gamepad2.dpad_down && scissor_Relic.getCurrentPosition() >= 100 || gamepad2.y){
+        if (gamepad2.dpad_down && scissor_Relic.getCurrentPosition() >= 100 || gamepad2.y) {
+            if (scissor_Relic.getMode() != DcMotor.RunMode.RUN_USING_ENCODER) {
+                scissor_Relic.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
             scissor_Relic.setPower(-1.0d);
         }
-        else if (gamepad2.dpad_up && scissor_Relic.getCurrentPosition() <= 3220){
+        //For the Scissor Lift, the old value is 3220
+        else if (gamepad2.dpad_up && scissor_Relic.getCurrentPosition() <= 2000) {
+            if (scissor_Relic.getMode() != DcMotor.RunMode.RUN_USING_ENCODER) {
+                scissor_Relic.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
             scissor_Relic.setPower(1.0d);
         }
+        else if(gamepad2.a){
+            if (scissor_Relic.getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
+                scissor_Relic.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+
+            scissor_Relic.setPower(1.0d);
+            scissor_Relic.setTargetPosition(_scissPosition1);
+        }
+        else if (gamepad2.b){
+            if (scissor_Relic.getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
+                scissor_Relic.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+
+            scissor_Relic.setPower(1.0d);
+            scissor_Relic.setTargetPosition(_scissPosition2);
+        }
         else {
-            scissor_Relic.setPower(0.0d);
+            if (scissor_Relic.getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
+                scissor_Relic.setPower(0.0d);
+            }
         }
 
-        if (gamepad2.dpad_right && relic_Motor.getCurrentPosition() <= 1770){
+        if (gamepad2.dpad_right && relic_Motor.getCurrentPosition() <= 1975){
             relic_Motor.setPower(1.0d);
         }
         else if (gamepad2.dpad_left && relic_Motor.getCurrentPosition() >= 50 || gamepad2.x){
@@ -290,6 +320,7 @@ public class RevHubTest_35 extends OpMode {
         }
 
 
+
         telemetry.addData("Scissor Lift: ", scissor_Relic.getCurrentPosition());
         telemetry.addData("Relic Motor: ", relic_Motor.getCurrentPosition());
 
@@ -302,6 +333,9 @@ public class RevHubTest_35 extends OpMode {
 
         telemetry.addData("Left: ", lift_motor_Left.getPower());
         telemetry.addData("Right: ", lift_motor_Right.getPower());
+
+        telemetry.addData("leftLift: ", lift_motor_Left.getPower());
+        telemetry.addData("rightLift: ", lift_motor_Right.getPower());
 
 
 
