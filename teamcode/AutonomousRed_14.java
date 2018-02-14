@@ -283,7 +283,18 @@ public class AutonomousRed_14 extends OpMode {
                         engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     }
 
-                      engine.SetSpeed(-0.15d, -0.15d);
+                      engine.SetSpeed(-0.30d, -0.30d);
+                }
+                else {
+                    NextStage();
+                }
+            case 14:
+                if (engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getCurrentPosition() < 500) {
+                    if(engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).getMode() != DcMotor.RunMode.RUN_USING_ENCODER) {
+                        engine.GetMotor(SampleOp_EngineModule.EngineMotor.FrontLeft).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+
+                    engine.SetSpeed(0.15d, 0.15d);
                 }
                 else {
                     NextStage();
